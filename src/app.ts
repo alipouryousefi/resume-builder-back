@@ -3,6 +3,7 @@ import { errorHandler } from './middlewares/errorHandler';
 import connectDB from './config/db';
 import cors from 'cors';
 import authRoutes from './routes/authRoutes';
+import path from 'path';
 
 const app = express();
 
@@ -14,6 +15,14 @@ app.use(
     })
   );
 app.use(express.json());
+
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, '../uploads'),{
+  setHeaders: (res, path, stat) => {
+    res.set('Content-Type', 'image/jpeg');
+    res.set("Access-Control-Allow-Origin", "*");
+  },
+}));
 
 // Routes
 app.use("/api/auth",authRoutes);   
