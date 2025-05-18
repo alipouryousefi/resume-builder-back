@@ -4,6 +4,7 @@ import connectDB from './config/db';
 import cors from 'cors';
 import authRoutes from './routes/authRoutes';
 import path from 'path';
+import resumeRoutes from './routes/resumeRoutes';
 
 const app = express();
 
@@ -26,7 +27,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads'),{
 
 // Routes
 app.use("/api/auth",authRoutes);   
-// app.use("/api/resume",resumeRoutes);
+app.use("/api/resume",resumeRoutes);
 
 // Global error handler (should be after routes)
 app.use(errorHandler);
