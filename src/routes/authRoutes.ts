@@ -2,11 +2,13 @@ import express, { Request, RequestHandler, Response } from "express";
 import protect from "../middlewares/authMiddleware";
 import { getUserProfile, registerUser, loginUser } from "../controllers/authController";
 import upload from "../middlewares/uploadMiddleware";
+import { validateRequest } from "../validations/validateRequest";
+import { loginValidation, registerValidation } from "../validations/authValidation";
 
 const router = express.Router();
 
-router.post("/register", registerUser as RequestHandler);
-router.post("/login", loginUser as RequestHandler);
+router.post("/register", registerValidation, validateRequest as RequestHandler, registerUser as RequestHandler);
+router.post("/login", loginValidation, validateRequest as RequestHandler, loginUser as RequestHandler);
 router.get("/profile", protect as RequestHandler, getUserProfile as RequestHandler);
 
 

@@ -3,10 +3,22 @@ import Resume from '../models/Resume';
 import User from '../models/User';
 import path from 'path';
 import fs from 'fs';
+import {
+  CreateResumeDto,
+  CreateResumeResponseDto,
+  GetUserResumesResponseDto,
+  GetResumeByIdResponseDto,
+  UpdateResumeDto,
+  UpdateResumeResponseDto,
+  DeleteResumeResponseDto,
+} from '../dtos/resume.dto';
+import { IResume } from '../types/models';
+
+// ... existing code ...
 
 const createResume = async (
-  req: Request,
-  res: Response,
+  req: Request<{}, {}, CreateResumeDto>,
+  res: Response<CreateResumeResponseDto>,
   next: NextFunction,
 ) => {
   try {
@@ -81,9 +93,11 @@ const createResume = async (
       userId: req.user._id,
     });
 
+    const resumeData = newResume.toObject() as unknown as IResume;
+
     res.status(201).json({
       message: 'Resume created successfully',
-      resume: newResume,
+      resume: resumeData,
     });
   } catch (err) {
     next(err);
@@ -92,7 +106,7 @@ const createResume = async (
 
 const getUserResumes = async (
   req: Request,
-  res: Response,
+  res: Response<GetUserResumesResponseDto>,
   next: NextFunction,
 ) => {
   try {
@@ -100,9 +114,11 @@ const getUserResumes = async (
       updatedAt: -1,
     });
 
+    const resumeData = resumes.map(resume => resume.toObject() as unknown as IResume);
+
     res.status(200).json({
       message: 'Resumes fetched successfully',
-      resumes,
+      resumes: resumeData,
     });
   } catch (err) {
     next(err);
@@ -110,8 +126,8 @@ const getUserResumes = async (
 };
 
 const getResumeById = async (
-  req: Request,
-  res: Response,
+  req: Request<{ id: string }>,
+  res: Response<GetResumeByIdResponseDto>,
   next: NextFunction,
 ) => {
   try {
@@ -123,11 +139,15 @@ const getResumeById = async (
     if (!resume) {
       return res.status(404).json({
         message: 'Resume not found',
+        resume: null as unknown as IResume,
       });
     }
+
+    const resumeData = resume.toObject() as unknown as IResume;
+
     res.status(200).json({
       message: 'Resume fetched successfully',
-      resume,
+      resume: resumeData,
     });
   } catch (err) {
     next(err);
@@ -135,8 +155,8 @@ const getResumeById = async (
 };
 
 const updateResume = async (
-  req: Request,
-  res: Response,
+  req: Request<{ id: string }, {}, UpdateResumeDto>,
+  res: Response<UpdateResumeResponseDto>,
   next: NextFunction,
 ) => {
   try {
@@ -148,16 +168,18 @@ const updateResume = async (
     if (!resume) {
       return res.status(404).json({
         message: 'Resume not found',
+        resume: null as unknown as IResume,
       });
     }
 
     Object.assign(resume, req.body);
 
     const updatedResume = await resume.save();
+    const resumeData = updatedResume.toObject() as unknown as IResume;
 
     res.status(200).json({
       message: 'Resume updated successfully',
-      resume: updatedResume,
+      resume: resumeData,
     });
   } catch (err) {
     next(err);
@@ -165,8 +187,8 @@ const updateResume = async (
 };
 
 const deleteResume = async (
-  req: Request,
-  res: Response,
+  req: Request<{ id: string }>,
+  res: Response<DeleteResumeResponseDto>,
   next: NextFunction,
 ) => {
   try {
@@ -178,6 +200,7 @@ const deleteResume = async (
     if (!resume) {
       return res.status(404).json({
         message: 'Resume not found',
+        resume: null as unknown as IResume,
       });
     }
 
@@ -204,24 +227,17 @@ const deleteResume = async (
       }
     }
 
-    const deletedResume = await resume.deleteOne();
-
-    if (!deletedResume) {
-      return res.status(404).json({
-        message: 'Resume not found',
-      });
-    }
+    const resumeData = resume.toObject() as unknown as IResume;
+    await resume.deleteOne();
 
     res.status(200).json({
       message: 'Resume deleted successfully',
-      resume: deletedResume,
+      resume: resumeData,
     });
   } catch (err) {
     next(err);
   }
 };
-
-
 
 export {
   createResume,
