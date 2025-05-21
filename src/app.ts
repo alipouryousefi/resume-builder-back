@@ -7,8 +7,12 @@ import path from 'path';
 import resumeRoutes from './routes/resumeRoutes';
 import swaggerUi from 'swagger-ui-express';
 import { specs } from './config/swagger';
+import limiter from './config/rateLimiter';
 
 const app = express();
+
+// Apply rate limiting to all routes
+app.use(limiter);
 
 app.use(
     cors({
