@@ -5,6 +5,8 @@ import cors from 'cors';
 import authRoutes from './routes/authRoutes';
 import path from 'path';
 import resumeRoutes from './routes/resumeRoutes';
+import swaggerUi from 'swagger-ui-express';
+import { specs } from './config/swagger';
 
 const app = express();
 
@@ -16,6 +18,9 @@ app.use(
     })
   );
 app.use(express.json());
+
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, '../uploads'),{

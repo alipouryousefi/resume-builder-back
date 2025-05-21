@@ -22,10 +22,6 @@ export const registerValidation = [
     .isLength({ min: 6 })
     .withMessage('Password must be at least 6 characters long'),
   
-  body('profileImageUrl')
-    .optional()
-    .isURL()
-    .withMessage('Profile image must be a valid URL'),
 ];
 
 export const loginValidation = [
